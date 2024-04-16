@@ -1,5 +1,9 @@
 Shader "CatLikeCoding/Shader"
 {
+	Properties {
+			_Tint ("Tint", Color) = (1, 1, 1, 1)
+	}
+	
 	SubShader {
 		Pass {
 		    CGPROGRAM
@@ -9,12 +13,14 @@ Shader "CatLikeCoding/Shader"
 
 		    #include "UnityCG.cginc"
 
-		    float4 vertex_program () : SV_POSITION {
-		    	return 0;
+		    float4 _Tint;
+
+		    float4 vertex_program (float4 position : POSITION) : SV_POSITION {
+		    	return UnityObjectToClipPos(position);
 			}
 
 			float4  fragment_program (float4 position : SV_POSITION) : SV_TARGET {
-		    	return 0;
+		    	return _Tint;
 			}
 				
 			ENDCG
