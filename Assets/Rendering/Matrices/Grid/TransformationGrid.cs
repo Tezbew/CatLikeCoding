@@ -11,6 +11,7 @@ namespace Rendering.Matrices
 
         private Transform[] _grid;
 
+        private Matrix4x4 _transformation;
         private List<Transformation> _transformations;
 
         private void Awake ()
@@ -26,20 +27,26 @@ namespace Rendering.Matrices
 
         private void Update ()
         {
-            GetComponents(_transformations);
+            UpdateTransformation();
             for (int i = 0, z = 0; z < _gridResolution; z++)
             for (var y = 0; y < _gridResolution; y++)
             for (var x = 0; x < _gridResolution; x++, i++)
                 _grid[i].localPosition = TransformPoint(x, y, z);
         }
 
+        private void UpdateTransformation ()
+        {
+            GetComponents(_transformations);
+            if (_transformations.Count <= 0) return;
+            _transformation = _transformations[0].Matrix;
+            for (var i = 1; i < _transformations.Count; i++)
+                _transformation = _transformations[i].Matrix * _transformation;
+        }
+
         private Vector3 TransformPoint (int x, int y, int z)
         {
             var coordinates = GetCoordinates(x, y, z);
-            foreach (var t in _transformations)
-                coordinates = t.Apply(coordinates);
-
-            return coordinates;
+            return _transformation.MultiplyPoint(coordinates);
         }
 
         private Transform CreateGridPoint (int x, int y, int z)
